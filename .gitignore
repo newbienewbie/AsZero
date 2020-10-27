@@ -1,0 +1,6 @@
+bin/
+obj/
+.vs/
+.ionide/
+node_modules/
+.svn/
