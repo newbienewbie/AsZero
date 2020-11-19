@@ -25,14 +25,14 @@ namespace AsZero.Core.Services.HostedServices
             _logger.LogInformation( $"Queued Hosted Service is running");
             await BackgroundProcessing(stoppingToken);
 
-            async Task BackgroundProcessing(CancellationToken stoppingToken)
+            async Task BackgroundProcessing(CancellationToken ct)
             {
-                while (!stoppingToken.IsCancellationRequested)
+                while (!ct.IsCancellationRequested)
                 {
-                    var workItem = await _taskQueue.DequeueAsync(stoppingToken);
+                    var workItem = await _taskQueue.DequeueAsync(ct);
                     try
                     {
-                        await workItem(stoppingToken).ConfigureAwait(false);
+                        await workItem(ct).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
