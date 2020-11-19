@@ -6,6 +6,7 @@ using AsZero.Core.DbContexts;
 using AsZero.Core.Services.HostedServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,10 @@ namespace AsZero.WebApi
                 logging.AddLog4Net();
             });
             services.AddDbContext<AsZeroDbContext>(opts => {
-                opts.UseMySql(Configuration.GetConnectionString("AsZeroDbContext"));
+                opts.UseMySql(Configuration.GetConnectionString("AsZeroDbContext"), builder =>{
+                    var thisAssembly =typeof(Startup).Assembly;
+                    builder.MigrationsAssembly(thisAssembly.GetName().Name);
+                });
             });
             services.AddAsZeroHostedServices();
             services.AddControllersWithViews()
@@ -44,6 +48,13 @@ namespace AsZero.WebApi
                 .AddNewtonsoftJsonProtocol(opts => {
                     opts.PayloadSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 });
+
+            // Forwarded headers
+            services.Configure<ForwardedHeadersOptions>(opts => {
+                opts.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+                opts.KnownNetworks.Clear();
+                opts.KnownProxies.Clear();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,6 +68,7 @@ namespace AsZero.WebApi
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseForwardedHeaders();
 
             app.UseAuthentication();
             app.UseAuthorization();
