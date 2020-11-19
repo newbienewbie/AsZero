@@ -4,3 +4,4 @@ obj/
 .ionide/
 node_modules/
 .svn/
+appsettings.Development.json
