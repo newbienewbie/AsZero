@@ -13,6 +13,7 @@ namespace AsZero.Core.DbContexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            SeedDatabase(modelBuilder);
         }
 
         private static void SeedDatabase(ModelBuilder modelBuilder)
