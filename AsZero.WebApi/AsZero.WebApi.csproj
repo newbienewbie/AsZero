@@ -8,5 +8,8 @@
     <ProjectReference Include="..\AsZero.Core.Services\AsZero.Core.Services.csproj" />
   </ItemGroup>
 
-
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.1.7" />
+  </ItemGroup>
 </Project>
