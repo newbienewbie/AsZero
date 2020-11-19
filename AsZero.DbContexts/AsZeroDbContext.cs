@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 
-namespace AsZero.Core.DbContexts
+namespace AsZero.DbContexts
 {
     public class AsZeroDbContext : DbContext
     {
