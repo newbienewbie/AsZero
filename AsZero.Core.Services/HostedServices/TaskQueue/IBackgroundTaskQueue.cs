@@ -8,9 +8,9 @@ namespace AsZero.Core.Services.HostedServices
 {
     public interface IBackgroundTaskQueue
     {
-        void QueueBackgroundWorkItem(Func<CancellationToken, Task> workItem);
+        void QueueBackgroundWorkItem(Func<IServiceProvider, CancellationToken, Task> workItem);
 
-        Task<Func<CancellationToken, Task>> DequeueAsync( CancellationToken cancellationToken);
+        Task<Func<IServiceProvider, CancellationToken, Task>> DequeueAsync( CancellationToken cancellationToken);
     }
 
 

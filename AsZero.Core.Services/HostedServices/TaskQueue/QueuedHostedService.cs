@@ -9,14 +9,17 @@ namespace AsZero.Core.Services.HostedServices
     public class QueuedHostedService : BackgroundService
     {
         private readonly ILogger<QueuedHostedService> _logger;
+        private readonly IServiceProvider _sp;
         private readonly IBackgroundTaskQueue _taskQueue;
 
         public QueuedHostedService(
             IBackgroundTaskQueue taskQueue,
+            IServiceProvider sp,
             ILogger<QueuedHostedService> logger
         ){
             _taskQueue = taskQueue;
             _logger = logger;
+            this._sp = sp;
         }
 
 
@@ -32,7 +35,7 @@ namespace AsZero.Core.Services.HostedServices
                     var workItem = await _taskQueue.DequeueAsync(ct);
                     try
                     {
-                        await workItem(ct).ConfigureAwait(false);
+                        await workItem(this._sp, ct).ConfigureAwait(false);
                     }
                     catch (Exception ex)
                     {
