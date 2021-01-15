@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace AsZero.Core.Services.Auth
 {
@@ -153,6 +155,21 @@ namespace AsZero.Core.Services.Auth
             await this._dbContext.SaveChangesAsync();
             return new SucceededOpResult<User>(existed);
         }
+
+        public async Task<ClaimsPrincipal> LoadPrincipalAsync(string account, bool force)
+        {
+            var user = await this._dbContext.Users.Where(u => u.Account == account)
+                    .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                    .FirstOrDefaultAsync();
+            if (user == null)
+                return null;
+            var claims = user.UserRoles.Select(ur => new Claim(ClaimTypes.Role, ur.Role.RoleName));
+            var identity = new ClaimsIdentity(claims, "X-Authen");
+            var principal = new ClaimsPrincipal(identity);
+            return principal;
+        }
+
     }
 
 }

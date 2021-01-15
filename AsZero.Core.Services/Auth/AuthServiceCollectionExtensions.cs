@@ -12,6 +12,7 @@ namespace AsZero.Core.Services.Auth
         {
             services.AddSingleton<IPasswordHasher, DefaultPasswordHasher>();
             services.AddScoped<IUserManager, DefaultUserManager>();
+            services.AddSingleton<IPrincipalAccessor, ClaimsPrincipalAccessor>();
             return services;
         }
     }

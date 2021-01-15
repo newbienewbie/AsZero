@@ -1,0 +1,50 @@
+﻿<Window x:Class="AsZero.Wpf.Views.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="登录" Height="500" Width="350" 
+        ResizeMode="NoResize" 
+        WindowStartupLocation="CenterScreen" 
+        WindowStyle="None" 
+        MouseLeftButtonDown="MoveWindow_MouseLeftButtonDown"
+        FontFamily="Segoe UI Emoji">
+    <Grid>
+
+        <Rectangle Height="280" VerticalAlignment="Top">
+            <Rectangle.Fill>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF2281D1"/>
+                    <GradientStop Color="#FF34268A" Offset="1"/>
+                    <GradientStop Color="#FF33288B" Offset="0.546"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <Rectangle Width="280" Height="240" VerticalAlignment="Bottom" Margin="0,80" RadiusY="10" RadiusX="10" Fill="White">
+            <Rectangle.Effect>
+                <DropShadowEffect BlurRadius="15" Direction="0" RenderingBias="Quality" ShadowDepth="1" Color="#FFBBBBBB"/>
+            </Rectangle.Effect>
+        </Rectangle>
+
+        <Viewbox Margin="0,140,0,0" Height="46"  VerticalAlignment="Top">
+            <Label Content="AsZero系统" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5" Foreground="Salmon" FontSize="18"/>
+        </Viewbox>
+        <Grid VerticalAlignment="Bottom" Margin="35,80" Height="240">
+            <StackPanel VerticalAlignment="Center" Margin="15">
+                <TextBox Text="{Binding Account}" Margin="0,10" materialDesign:HintAssist.Hint="用户名" Style="{StaticResource MaterialDesignFloatingHintTextBox}" FontFamily="Champagne &amp; Limousines" FontSize="18"/>
+                <PasswordBox x:Name="pswdbox" Margin="0,10" materialDesign:HintAssist.Hint="密码" Style="{StaticResource MaterialDesignFloatingHintPasswordBox}" FontFamily="Champagne &amp; Limousines" FontSize="18"/>
+                <TextBlock Text="{Binding Tips}"  Margin="0,10" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#FFE51E1E"></TextBlock>
+            </StackPanel>
+        </Grid>
+
+        <Button Command="{Binding CmdValidateUser}" CommandParameter="{Binding ElementName=pswdbox}" Width="150" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,65" Content="登录"/>
+        <!--
+<Button Command="{Binding CmdCreateUser}" CommandParameter="{Binding ElementName=pswdbox}" Width="150" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,65" Content="创建"/>
+        -->
+
+        <TextBlock Text="AsZero" FontStyle="Italic" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="30" Foreground="Gray" Cursor="Hand"/>
+    </Grid>
+</Window>

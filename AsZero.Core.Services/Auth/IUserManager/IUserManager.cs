@@ -1,6 +1,7 @@
 ﻿using FutureTech.OpResults;
 using AsZero.Core.Entities;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace AsZero.Core.Services.Auth
 {
@@ -51,5 +52,13 @@ namespace AsZero.Core.Services.Auth
         /// <param name="newPass"></param>
         /// <returns></returns>
         Task<OpResult<User>> ChangePasswordAsync(string account, string newPass);
+
+        /// <summary>
+        /// 加载用户Principal
+        /// </summary>
+        /// <param name="account"></param>
+        /// <param name="force"></param>
+        /// <returns></returns>
+        Task<ClaimsPrincipal> LoadPrincipalAsync(string account, bool force);
     }
 }
