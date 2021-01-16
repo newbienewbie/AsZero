@@ -83,18 +83,14 @@ namespace AsZero.Wpf
 
         protected override void OnExit(ExitEventArgs e)
         {
-            try
+            using (_host)
             {
-                using (_host)
-                {
-                    var lieftime = _host.Services.GetRequiredService<IHostApplicationLifetime>();
-                    lieftime.StopApplication();
-                }
+                var lieftime = _host.Services.GetRequiredService<IHostApplicationLifetime>();
+                lieftime.StopApplication();
             }
-            finally { 
-                base.OnExit(e);
-            }
+            base.OnExit(e);
         }
+
     }
 
 }
