@@ -11,6 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MediatR;
+using AsZero.Core.Services.Messages;
+using System.Reflection;
 
 namespace AsZero.Wpf
 {
@@ -30,7 +33,13 @@ namespace AsZero.Wpf
             //services.AddHistoryServices<CurrentUserIdProvider>(opts => {
             //    opts.UseMySql(Configuration.GetConnectionString("OpenAuthDBContext"));
             //});
+
             services.AddAuth();
+            services.AddSingleton<IPrincipalAccessor, ClaimsPrincipalAccessor>();
+
+            #region Message Handlers
+            services.AddMediatR(typeof(LoginRequest).Assembly);
+            #endregion
 
             services.AddViews();
         }

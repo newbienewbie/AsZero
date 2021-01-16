@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AsZero.Core.Services.HostedServices;
+using AsZero.Core.Services.Messages;
 using AsZero.DbContexts;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -41,6 +43,7 @@ namespace AsZero.WebApi
                 });
             });
             services.AddAsZeroHostedServices();
+            services.AddMediatR(typeof(LoginRequest).Assembly);
             #endregion
 
             #region web

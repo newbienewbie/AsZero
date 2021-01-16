@@ -13,52 +13,45 @@ using System.Windows.Navigation;
 using AsZero.Core.Services.Auth;
 using AsZero.Core.Entities;
 using AsZero.Wpf.Views;
+using MediatR;
+using AsZero.Core.Services.Messages;
 
 namespace AsZero.Wpf.ViewModels
 {
     public class LoginPageViewModel : ViewModelBase
     {
-        private readonly IServiceProvider _sp;
-        private readonly RouterViewModel _routes;
         private readonly IPrincipalAccessor _principalAccessor;
+        private readonly IServiceProvider _sp;
 
         public User User { get; private set; }
 
-        public LoginPageViewModel(IServiceProvider sp, RouterViewModel routes, IPrincipalAccessor principalAccessor)
+        public LoginPageViewModel(IPrincipalAccessor principalAccessor, IServiceProvider serviceprovider)
         {
-            this._sp = sp;
-            this._routes = routes;
             this._principalAccessor = principalAccessor;
+            this._sp = serviceprovider;
 
             this.CmdValidateUser = new AsyncRelayCommand<PasswordBox>(
                 async o => {
-                    OpResult<User> res = null;
-                    ClaimsPrincipal principal;
                     using (var scope = this._sp.CreateScope())
                     {
                         var sp = scope.ServiceProvider;
-                        var _userMgr = sp.GetRequiredService<IUserManager>();
-                        res = await _userMgr.ValidateUserAsync(this.Account, o.Password);
-                        if (res?.Success == true)
-                        {
-                            this.Tips = String.Empty;
-                            this.User = res.Data;
-                            this.HasSignedIn = true;
+                        var mediator =  sp.GetRequiredService<IMediator>();
+                        var loginResp = await mediator.Send(new LoginRequest {
+                            Account = this.Account,
+                            Password = o.Password,
+                        });
+                        this._principalAccessor.SetCurrentPrincipal(loginResp.Principal);
 
-                            principal = await _userMgr.LoadPrincipalAsync(this.Account, true);
-                            this._principalAccessor.SetCurrentPrincipal(principal);
-                            var loginWin = sp.GetRequiredService<LoginWindow>();
+                        var loginWin = sp.GetRequiredService<LoginWindow>();
+                        var mainWin = sp.GetRequiredService<MainWindow>();
+                        if (loginResp.Status)
+                        {
                             loginWin.Hide();
-                            var main = sp.GetRequiredService<MainWindow>();
-                            main.Show();
+                            mainWin.Show();
                         }
                         else
                         {
-                            this._principalAccessor.SetCurrentPrincipal(null);
-                            this.Tips = res.Message;
-                            this.User = null;
-                            this.HasSignedIn = false;
-                            MessageBox.Show("登录失败");
+                            this.Tips = "登录失败！";
                         }
                     }
                 },
@@ -75,20 +68,23 @@ namespace AsZero.Wpf.ViewModels
                         Status = UserStatus.Created,
                         UserName = this.Account,
                     };
-                    OpResult<User> res = null;
+                    var req = new CreateUserRequest { 
+                        Input = input,
+                    };
                     using (var scope = this._sp.CreateScope())
                     {
                         var sp = scope.ServiceProvider;
-                        var _userMgr = sp.GetRequiredService<IUserManager>();
-                        res = await _userMgr.CreateUserAsync(input);
-                    }
-                    if (res.Success)
-                    {
-                        MessageBox.Show("用户创建成功！");
-                    }
-                    else
-                    {
-                        MessageBox.Show("用户创建失败！");
+                        var mediator = sp.GetRequiredService<IMediator>();
+
+                        OpResult<User> res = await mediator.Send(req);
+                        if (res.Success)
+                        {
+                            MessageBox.Show("用户创建成功！");
+                        }
+                        else
+                        {
+                            MessageBox.Show("用户创建失败！");
+                        }
                     }
                 },
                 o => true
@@ -131,19 +127,6 @@ namespace AsZero.Wpf.ViewModels
                     this._hasSignedIn = value;
                     this.OnPropertyChanged(nameof(HasSignedIn));
                 }
-            }
-        }
-
-        public bool IsAdmin
-        {
-            get
-            {
-                var principal = this._principalAccessor.GetCurrentPrincipal();
-                if (principal?.HasClaim(ClaimTypes.Role, "管理员") == true)
-                {
-                    return true;
-                }
-                return false;
             }
         }
 

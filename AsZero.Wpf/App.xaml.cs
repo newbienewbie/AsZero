@@ -44,11 +44,11 @@ namespace AsZero.Wpf
                 })
                 .ConfigureServices(HostStartup.ConfigureServices)
                 .Build();
-            this.ServiceProvider = this._host.Services;
+            this.RootServiceProvider = this._host.Services;
         }
 
         public IHost _host { get; private set; }
-        public IServiceProvider ServiceProvider { get; internal set; }
+        public IServiceProvider RootServiceProvider { get; internal set; }
 
         private CancellationTokenSource cts = new CancellationTokenSource();
 
@@ -56,7 +56,7 @@ namespace AsZero.Wpf
         {
             try
             {
-                using (var scope = this.ServiceProvider.CreateScope())
+                using (var scope = this.RootServiceProvider.CreateScope())
                 {
                     var sp = scope.ServiceProvider;
                     var env = sp.GetRequiredService<IHostEnvironment>();
@@ -66,7 +66,8 @@ namespace AsZero.Wpf
                     await db.Database.EnsureCreatedAsync();
                     logger.LogInformation($"数据库确认初始化成功！当前环境:env={env.EnvironmentName}||Root={env.ContentRootPath}");
                 }
-                var loginWindow = this.ServiceProvider.GetRequiredService<LoginWindow>();
+
+                var loginWindow = this.RootServiceProvider.GetRequiredService<LoginWindow>();
                 loginWindow.Show();
                 _ = Task.Run(async () =>
                 {
@@ -82,12 +83,17 @@ namespace AsZero.Wpf
 
         protected override void OnExit(ExitEventArgs e)
         {
-            using (_host)
+            try
             {
-                var lieftime = _host.Services.GetRequiredService<IHostApplicationLifetime>();
-                lieftime.StopApplication();
+                using (_host)
+                {
+                    var lieftime = _host.Services.GetRequiredService<IHostApplicationLifetime>();
+                    lieftime.StopApplication();
+                }
             }
-            base.OnExit(e);
+            finally { 
+                base.OnExit(e);
+            }
         }
     }
 
