@@ -71,7 +71,15 @@ namespace AsZero.Wpf
                 loginWindow.Show();
                 _ = Task.Run(async () =>
                 {
-                    await _host.RunAsync(cts.Token);
+                    try
+                    {
+                        await _host.RunAsync(cts.Token);
+                    }
+                    catch (Exception ex)
+                    { 
+                        MessageBox.Show(ex.Message);
+                        this.Shutdown();
+                    }
                 });
             }
             catch (Exception ex)
